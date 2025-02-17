@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-SAMPLE=GEX4_stroke
+SAMPLE=GEX1_jeong
 BASE_DIR=/data/scrna/scrna_snubh_batch20250106_counts
 VCF=$BASE_DIR/vcf_merged
 VCF_NEW=$BASE_DIR/vcf_normalized
@@ -29,9 +29,22 @@ bcftools norm -m -both -f /data/refs/refdata-gex-GRCh38-2024-A/fasta/genome.fa \
 mv $VCF_NEW/${SAMPLE}_normalized_tmp.vcf.gz $VCF_NEW/${SAMPLE}_normalized.vcf.gz
 tabix -p vcf $VCF_NEW/${SAMPLE}_normalized.vcf.gz
 
-echo "Normalization complete! Final VCF: $VCF_NEW/${SAMPLE}_normalized.vcf.gz"
-
 # Run script in the background
 # chmod +x $HOME/projects/nm1/nm1_vcf_normalization.sh
-# $HOME/projects/nm1/nm1_vcf_normalization.sh > norm_1.log 2>&1 &
+# nohup $HOME/projects/nm1/nm1_vcf_normalization.sh > norm_1.log 2>&1 &
 # tail -f norm_1.log
+# bcftools view /data/scrna/scrna_snubh_batch20250106_counts/vcf_normalized/GEX1_jeong_normalized.vcf.gz | head -n 80
+# bcftools view /data/scrna/scrna_snubh_batch20250106_counts/vcf_normalized/GEX1_jeong_normalized_GQ_fixed.vcf.gz | head -n 80
+# bcftools view /data/scrna/scrna_snubh_batch20250106_counts/vcf_normalized/GEX1_jeong_normalized_with_GQ.vcf.gz | head -n 80
+
+# After fixing the GQ values: 
+bgzip $VCF_NEW/${SAMPLE}_normalized_mod.vcf
+tabix -p vcf $VCF_NEW/${SAMPLE}_normalized_mod.vcf.gz
+
+
+# Step 5: 
+## Sorting chromosomes
+
+bcftools sort -Oz -o $VCF_NEW/${SAMPLE}_normalized_sorted.vcf.gz $VCF_NEW/${SAMPLE}_normalized_mod.vcf.gz
+tabix -p vcf $VCF_NEW/${SAMPLE}_normalized_sorted.vcf.gz
+

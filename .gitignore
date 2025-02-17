@@ -1,0 +1,25 @@
+# Ignore all data files
+*.csv
+*.tsv
+*.fastq
+*.bam
+*.vcf
+*.h5
+*.hdf5
+*.gz
+*.zip
+*.tar
+*.tar.gz
+*.log
+*.out
+
+# Ignore folders with large files
+data/
+results/
+backups/
+tmp/
+cache/
+
+# Ignore system files
+.DS_Store
+Thumbs.db

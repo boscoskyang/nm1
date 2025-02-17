@@ -1,0 +1,123 @@
+---
+title: "nm2_analysis"
+author: "Bosco Seong Kyu Yang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(Seurat)
+library(SeuratData)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(HGNChelper)
+library(openxlsx)
+library(biomaRt)
+library(spacexr)
+library(sp)
+library(ggpubr)
+library(WGCNA)
+library(parallel)
+library(clusterProfiler)
+library(org.Mm.eg.db)
+library(hdf5r)
+# NEED TO UPDATE 'MATRIX'
+# Codes for installing specific tools
+
+# # RCTD
+# if (!requireNamespace("spacexr", quietly = TRUE)) {
+#   devtools::install_github("dmcable/spacexr", build_vignettes = FALSE)
+# }
+
+
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::version()
+# If your bioconductor version is previous to 4.0, see the section bellow
+# BiocManager::install(version = "3.20")
+
+# BiocManager::install('impute')
+# install.packages('WGCNA')
+
+
+# for WGCNA
+options(stringsAsFactors = FALSE)
+allowWGCNAThreads()
+
+# Increase the global short-term memory capacity
+options(future.globals.maxSize= 800000000000) # 800GB
+getOption("future.globals.maxSize")
+# Use parallelization
+library(future)
+plan()
+plan("multisession", workers = 8)
+plan()
+```
+
+# CHECK POINT
+```{r }
+# # Checkpoint 
+# save.image(file = "/data/nm2_global_env_20250128v2.RData")
+
+
+# load("/data/nm2_global_env_20250128v2.RData")
+
+
+
+```
+
+# DATA PATH VARIABLE SETUP 
+```{r}
+# sample_name <- 'GEX1_jeong'
+# sample_name <- 'GEX2_han'
+# sample_name <- 'GEX3_gil'
+sample_name <- 'GEX4_stroke'
+
+
+demuxalot_dir = paste0('/data/scrna/scrna_snubh_batch20250106_counts/demuxafy/demuxalot/',sample_name,'_assignments_refined.tsv.gz')
+count_dir = paste0('/data/scrna/scrna_snubh_batch20250106_counts/',sample_name,'/outs/filtered_feature_bc_matrix.h5')
+output_dir = paste0('/data/scrna/scrna_snubh_batch20250106_counts/',sample_name,'/')
+
+```
+
+# Cell Assignment
+```{r}
+
+demultiplexed_df <- read.delim(demuxalot_dir, sep="\t", header=TRUE)
+head(demultiplexed_df,5)
+colnames(demultiplexed_df) <- c("BARCODE", "Assignment")
+seurat_obj <- Read10X_h5(count_dir)
+seurat_obj <- CreateSeuratObject(seurat_obj)
+head(Cells(seurat_obj),5)
+
+
+demultiplexed_df$BARCODE <- str_trim(demultiplexed_df$BARCODE)
+
+metadata_df <- data.frame(Cell = Cells(seurat_obj))
+metadata_df <- left_join(metadata_df, demultiplexed_df, by = c("Cell" = "BARCODE"))
+seurat_obj <- AddMetaData(seurat_obj, metadata = metadata_df$Assignment, col.name = "Assignment")
+
+head(seurat_obj@meta.data,5)
+table(seurat_obj$Assignment)
+
+# Show me singles and doublets distribution
+
+doublet_cells <- grep("\\+", seurat_obj@meta.data$Assignment, value = FALSE)
+cell_counts <- table(ifelse(doublet_cells, "Doublets", "Singlets"))
+print(cell_counts)
+
+# Remove Doublets
+seurat_obj <- subset(seurat_obj, cells = setdiff(Cells(seurat_obj), Cells(seurat_obj)[doublet_cells]))
+
+head(seurat_obj@meta.data,5)
+table(seurat_obj$Assignment)
+
+```
+
+# Save RDS objects
+```{r}
+saveRDS(seurat_obj, file = paste0(output_dir,sample_name,"_count_matrix_cell_assigned_matrix.rds"))
+
+
+```

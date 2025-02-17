@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Define Sample Name ##
-SAMPLE=GEX1_jeong  # Change this to run for a different sample
+SAMPLE=GEX4_stroke  # Change this to run for a different sample
 
 ## Paths to files ##
 BASE_DIR=/data/scrna/scrna_snubh_batch20250106_counts

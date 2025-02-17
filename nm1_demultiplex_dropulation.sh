@@ -90,7 +90,7 @@ echo "Pipeline completed successfully for $SAMPLE!"
 
 # RUN!
 
-chmod +x $HOME/projects/nm1/nm1_demultiplex_dropulation.sh
-nohup $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_4.log 2>&1 & echo $! > $HOME/dropul_4.pid
-ps -fp $(cat $HOME/dropul_4.pid)
-tail -f $HOME/dropul_4.log
+# chmod +x $HOME/projects/nm1/nm1_demultiplex_dropulation.sh
+# nohup $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_4.log 2>&1 & echo $! > $HOME/dropul_4.pid
+# ps -fp $(cat $HOME/dropul_4.pid)
+# tail -f $HOME/dropul_4.log

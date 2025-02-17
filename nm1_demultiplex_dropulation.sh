@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Define Sample Name ##
-SAMPLE=GEX2_han  # Change this to run for a different sample
+SAMPLE=GEX4_stroke  # Change this to run for a different sample
 
 ## Paths to files ##
 BASE_DIR=/data/scrna/scrna_snubh_batch20250106_counts
@@ -91,6 +91,6 @@ echo "Pipeline completed successfully for $SAMPLE!"
 # RUN!
 
 chmod +x $HOME/projects/nm1/nm1_demultiplex_dropulation.sh
-nohup $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_3.log 2>&1 & echo $! > $HOME/dropul_3.pid
-ps -fp $(cat $HOME/dropul_1.pid)
-tail -f $HOME/dropul_3.log
+nohup $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_4.log 2>&1 & echo $! > $HOME/dropul_4.pid
+ps -fp $(cat $HOME/dropul_4.pid)
+tail -f $HOME/dropul_4.log

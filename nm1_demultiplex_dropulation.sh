@@ -94,3 +94,4 @@ echo "Pipeline completed successfully for $SAMPLE!"
 # $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_1.log 2>&1 echo $! > $HOME/dropul_1.pid
 # ps -fp $(cat $HOME/dropul_1.pid)
 # tail -f $HOME/dropul_1.log
+#

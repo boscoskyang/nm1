@@ -1,6 +1,9 @@
 #!/bin/bash
 
 ## Define Sample Name ##
+# SAMPLE=GEX1_jeong  # Change this to run for a different sample
+# SAMPLE=GEX2_han  # Change this to run for a different sample
+# SAMPLE=GEX3_gil  # Change this to run for a different sample
 SAMPLE=GEX4_stroke  # Change this to run for a different sample
 
 ## Paths to files ##
@@ -38,41 +41,41 @@ done
 
 echo "All input files found, proceeding with analysis."
 
-echo "Running AssignCellsToSamples for $SAMPLE..."
-singularity exec -B /data:/data Demuxafy.sif AssignCellsToSamples -- \
-    --CELL_BC_FILE $BARCODES \
-    --INPUT_BAM $BAM_DROPULATION \
-    --OUTPUT $DROPULATION_OUTDIR/assignments.tsv.gz \
-    --VCF $NORM_VCF \
-    --SAMPLE_FILE $INDS \
-    --CELL_BARCODE_TAG 'CB' \
-    --MOLECULAR_BARCODE_TAG 'UB' \
-    --VCF_OUTPUT $DROPULATION_OUTDIR/assignment.vcf \
-    --MAX_ERROR_RATE 0.05 \
+# echo "Running AssignCellsToSamples for $SAMPLE..."
+# singularity exec -B /data:/data Demuxafy.sif AssignCellsToSamples -- \
+#     --CELL_BC_FILE $BARCODES \
+#     --INPUT_BAM $BAM_DROPULATION \
+#     --OUTPUT $DROPULATION_OUTDIR/assignments.tsv.gz \
+#     --VCF $NORM_VCF \
+#     --SAMPLE_FILE $INDS \
+#     --CELL_BARCODE_TAG 'CB' \
+#     --MOLECULAR_BARCODE_TAG 'UB' \
+#     --VCF_OUTPUT $DROPULATION_OUTDIR/assignment.vcf \
+#     --MAX_ERROR_RATE 0.05 \
 
-if [[ $? -ne 0 ]]; then
-    echo "Error: AssignCellsToSamples failed!" >&2
-    exit 1
-fi
-echo "AssignCellsToSamples completed successfully."
+# if [[ $? -ne 0 ]]; then
+#     echo "Error: AssignCellsToSamples failed!" >&2
+#     exit 1
+# fi
+# echo "AssignCellsToSamples completed successfully."
 
-echo "Running DetectDoublets for $SAMPLE..."
-singularity exec -B /data:/data Demuxafy.sif DetectDoublets \
-    --CELL_BC_FILE $BARCODES \
-    --INPUT_BAM $BAM_DROPULATION \
-    --OUTPUT $DROPULATION_OUTDIR/likelihoods.tsv.gz \
-    --VCF $NORM_VCF \
-    --CELL_BARCODE_TAG $CELL_TAG \
-    --MOLECULAR_BARCODE_TAG $UMI_TAG \
-    --SINGLE_DONOR_LIKELIHOOD_FILE $DROPULATION_OUTDIR/assignments.tsv.gz \
-    --SAMPLE_FILE $INDS \
-    --MAX_ERROR_RATE 0.05
+# echo "Running DetectDoublets for $SAMPLE..."
+# singularity exec -B /data:/data Demuxafy.sif DetectDoublets -- \
+#     --CELL_BC_FILE $BARCODES \
+#     --INPUT_BAM $BAM_DROPULATION \
+#     --OUTPUT $DROPULATION_OUTDIR/likelihoods.tsv.gz \
+#     --VCF $NORM_VCF \
+#     --CELL_BARCODE_TAG $CELL_TAG \
+#     --MOLECULAR_BARCODE_TAG $UMI_TAG \
+#     --SINGLE_DONOR_LIKELIHOOD_FILE $DROPULATION_OUTDIR/assignments.tsv.gz \
+#     --SAMPLE_FILE $INDS \
+#     --MAX_ERROR_RATE 0.05
 
-if [[ $? -ne 0 ]]; then
-    echo "Error: DetectDoublets failed!" >&2
-    exit 1
-fi
-echo "DetectDoublets completed successfully."
+# if [[ $? -ne 0 ]]; then
+#     echo "Error: DetectDoublets failed!" >&2
+#     exit 1
+# fi
+# echo "DetectDoublets completed successfully."
 
 echo "Running dropulation_call.R for $SAMPLE..."
 singularity exec -B /data:/data Demuxafy.sif dropulation_call.R \
@@ -80,10 +83,6 @@ singularity exec -B /data:/data Demuxafy.sif dropulation_call.R \
     --doublet $DROPULATION_OUTDIR/likelihoods.tsv.gz \
     --out $DROPULATION_OUTDIR/updated_assignments.tsv.gz
 
-if [[ $? -ne 0 ]]; then
-    echo "Error: dropulation_call.R failed!" >&2
-    exit 1
-fi
 echo "dropulation_call.R completed successfully."
 
 echo "Pipeline completed successfully for $SAMPLE!"
@@ -91,6 +90,7 @@ echo "Pipeline completed successfully for $SAMPLE!"
 # RUN!
 
 # chmod +x $HOME/projects/nm1/nm1_demultiplex_dropulation.sh
-# nohup $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_4.log 2>&1 & echo $! > $HOME/dropul_4.pid
-# ps -fp $(cat $HOME/dropul_4.pid)
-# tail -f $HOME/dropul_4.log
+# $HOME/projects/nm1/nm1_demultiplex_dropulation.sh
+# $HOME/projects/nm1/nm1_demultiplex_dropulation.sh > $HOME/dropul_1.log 2>&1 echo $! > $HOME/dropul_1.pid
+# ps -fp $(cat $HOME/dropul_1.pid)
+# tail -f $HOME/dropul_1.log

@@ -303,6 +303,35 @@ ggVennDiagram(venn_data) +
 # Cell Assignment
 ```{r}
 
+library(Seurat)
+library(SeuratDisk)
+
+# Define the file paths
+file_paths <- c(
+  GEX1_jeong = "/data/scrna/scrna_snubh_batch20250106_counts/GEX1_jeong/outs/filtered_feature_bc_matrix.h5",
+  GEX2_han   = "/data/scrna/scrna_snubh_batch20250106_counts/GEX2_han/outs/filtered_feature_bc_matrix.h5",
+  GEX3_gil   = "/data/scrna/scrna_snubh_batch20250106_counts/GEX3_gil/outs/filtered_feature_bc_matrix.h5",
+  GEX4_stroke = "/data/scrna/scrna_snubh_batch20250106_counts/GEX4_stroke/outs/filtered_feature_bc_matrix.h5"
+)
+
+# Read each dataset into a Seurat object and store in a list
+seurat_list <- lapply(names(file_paths), function(sample_name) {
+  seurat_obj <- Read10X_h5(file_paths[sample_name])
+  seurat_obj <- CreateSeuratObject(counts = seurat_obj, project = sample_name)
+  
+  # Add metadata column 'sample_gex'
+  seurat_obj$sample_gex <- sample_name
+  
+  return(seurat_obj)
+})
+
+# Merge all individual Seurat objects into one
+combined_seurat <- merge(seurat_list[[1]], y = seurat_list[-1], add.cell.ids = names(file_paths))
+
+# Verify metadata
+table(combined_seurat$sample_gex)
+
+
 demultiplexed_df <- read.delim(demuxalot_dir, sep="\t", header=TRUE)
 head(demultiplexed_df,5)
 colnames(demultiplexed_df) <- c("BARCODE", "Assignment")
